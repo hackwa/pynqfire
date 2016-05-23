@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xd:data xmlns:xd="http://www.xilinx.com/xd">
+  <xd:accel name="cpp_FIR" platform="zybo" compiler="g++" srcfile="cpp_FIR.cpp" srcpath="/home/hackwad/workspace/filter/src" flags="-I/home/hackwad/workspace/filter/src -I/home/hackwad/workspace/filter/src -I/home/hackwad/workspace/filter/src/platform -Wall -O0 -g -fmessage-length=0 -MMD -MP -D __SDSCC__" clk_id="1" ip_requires_adapter="1" ip_is_rtl="0" vlnv="" is_opencl="0" asmfile="cpp_FIR.s"/>
+</xd:data>
