@@ -16,7 +16,7 @@ class fir():
         self.overlay = Overlay(self.bitfile)
         self.overlay.download()
         self.ffi = cffi.FFI()
-        self.lib = ffi.dlopen(self.libfile)
+        self.lib = self.ffi.dlopen(self.libfile)
         self.ffi.cdef("void _p0_cpp_FIR_0(int x, int * ret);")
         self.ffi.cdef("void _Z13_p0_cpp_FIR_0iPi(int x, int * ret);")
 
