@@ -2,7 +2,7 @@ import cffi
 from fir import general_const
 from pynq import Overlay
 
-class FIR():
+class fir():
     def __init__(self):
         self.bitfile = general_const.BITFILE
         self.libfile = general_const.LIBRARY

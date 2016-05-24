@@ -19,7 +19,7 @@ if len(sys.argv) > 1 and sys.argv[1] == 'install':
 
 setup(
     name = "fir",
-    version = fir.__version,
+    version = fir.__version__,
     url = 'https://github.com/hackwa/pynq',
     license = 'Apache Software License',
     author = "Anurag Dubey",
