@@ -19,11 +19,11 @@ if len(sys.argv) > 1 and sys.argv[1] == 'install':
 setup(
     name = "fir",
     version = fir.__version,
-    url = 'https://github.com/hackwa/pynq'
-    license = 'Apache Software License'
+    url = 'https://github.com/hackwa/pynq',
+    license = 'Apache Software License',
     author = "Anurag Dubey",
     author_email = "hackwad@xilinx.com",
     packages = ['fir'],
-    include_package_data = True
-    description = "Run a FIR filter on Hardware",
+    include_package_data = True,
+    description = "Run a FIR filter on Hardware"
 )
