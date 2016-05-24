@@ -22,11 +22,11 @@ class fir():
 
     def getResponse(self,datain = [0] * 85):
         dlen = len(datain)
-        self.response = [self.ffi.new("int",0)] * dlen
+        self.response = [self.ffi.new("int *")] * dlen
         for i in range(dlen):
             self.lib._Z13_p0_cpp_FIR_0iPi(self.ffi.cast("int",datain[i]),self.response[i])
         
         # Reset FIR Shift Regs
-        tmp = self.ffi.new("int")
+        tmp = self.ffi.new("int *")
         for i in range(nshift_reg):
             self.lib._Z13_p0_cpp_FIR_0iPi(self.ffi.cast("int",0),tmp)
