@@ -15,18 +15,18 @@ class fir():
     def initHw(self):
         self.overlay = Overlay(self.bitfile)
         self.overlay.download()
-        ffi = cffi.FFI()
+        self.ffi = cffi.FFI()
         self.lib = ffi.dlopen(self.libfile)
-        ffi.cdef("void _p0_cpp_FIR_0(int x, int * ret);")
-        ffi.cdef("void _Z13_p0_cpp_FIR_0iPi(int x, int * ret);")
+        self.ffi.cdef("void _p0_cpp_FIR_0(int x, int * ret);")
+        self.ffi.cdef("void _Z13_p0_cpp_FIR_0iPi(int x, int * ret);")
 
     def getResponse(self,datain = [0] * 85):
         dlen = len(datain)
-        self.response = [ffi.new("int",i)] * dlen
+        self.response = [self.ffi.new("int",i)] * dlen
         for i in range(dlen):
-            self.lib._Z13_p0_cpp_FIR_0iPi(ffi.cast("int",datain[i]),self.response[i])
+            self.lib._Z13_p0_cpp_FIR_0iPi(self.ffi.cast("int",datain[i]),self.response[i])
         
         # Reset FIR Shift Regs
-        tmp = ffi.new("int")
+        tmp = self.ffi.new("int")
         for i in range(nshift_reg):
-            self.lib._Z13_p0_cpp_FIR_0iPi(ffi.cast("int",0),tmp)
+            self.lib._Z13_p0_cpp_FIR_0iPi(self.ffi.cast("int",0),tmp)
