@@ -25,6 +25,8 @@ setup(
     author = "Anurag Dubey",
     author_email = "hackwad@xilinx.com",
     packages = ['fir'],
-    include_package_data = True,
+    package_data = {
+    '' : ['*.bin','*.tcl','*.so'],
+    },
     description = "Run a FIR filter on Hardware"
 )
