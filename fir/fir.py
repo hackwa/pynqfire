@@ -10,7 +10,7 @@ class fir():
         self.nshift_reg = 85
 
     def __version__(self):
-        return 0.1
+        return "0.1"
 
     def initHw(self):
         self.overlay = Overlay(self.bitfile)
