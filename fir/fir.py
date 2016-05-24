@@ -1,5 +1,5 @@
 import cffi
-from fft import general_const
+from fir import general_const
 from pynq import Overlay
 
 class FIR():
