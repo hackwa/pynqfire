@@ -3,6 +3,7 @@ import subprocess
 import sys
 import os
 import shutil
+import fir
 
 def makefile():
     srclib = "src/hardware/libfir.so"
