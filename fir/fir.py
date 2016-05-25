@@ -31,3 +31,13 @@ class fir():
         tmp = self.ffi.new("int *")
         for i in range(self.nshift_reg):
             self.lib._p0_cpp_FIR_0(self.ffi.cast("int",0),tmp)
+
+    def impulseResponse(self):
+        resp = []
+        tmp = self.ffi.new("int *")
+        self.lib._p0_cpp_FIR_0(self.ffi.cast("int",1),tmp)
+        resp.append(tmp[0])
+        for i in range(self.nshift_reg):
+            self.lib._p0_cpp_FIR_0(self.ffi.cast("int",0),tmp)
+            resp.append(tmp[0])
+        return resp
