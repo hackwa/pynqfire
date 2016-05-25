@@ -60,7 +60,7 @@ class fir():
         return "0.1"
 
     def initHw(self):
-    """Initialize Hardware
+        """Initialize Hardware
 
         Downloads the bitstream onto hardware using overlay.
         Reads the Shared Object and initializes CFFI.
@@ -74,7 +74,7 @@ class fir():
         -------
         None
 
-    """
+        """
         self.overlay = Overlay(self.bitfile)
         self.overlay.download()
         self.ffi = cffi.FFI()
@@ -82,7 +82,7 @@ class fir():
         self.ffi.cdef("void _p0_cpp_FIR_0(int x, int * ret);")
 
     def getResponse(self,datain = [0] * 85):
-    """Send input to hardware and get response
+        """Send input to hardware and get response
 
         This method takes samples of data and then processes
         them on hardware. At the end, it resets the FIR Shift
@@ -98,7 +98,7 @@ class fir():
         None
             Use response attribute to read output.
 
-     """
+        """
         dlen = len(datain)
         resp = self.ffi.new("int *") 
         self.response = [None] * dlen
@@ -112,7 +112,7 @@ class fir():
             self.lib._p0_cpp_FIR_0(self.ffi.cast("int",0),tmp)
 
     def impulseResponse(self):
-    """Get impulse Response of filter
+        """Get impulse Response of filter
 
         This method sends an impulse to the filter and returns
         the output response.
@@ -126,7 +126,7 @@ class fir():
         list
             A list containing the filter response
 
-    """
+        """
         resp = []
         tmp = self.ffi.new("int *")
         self.lib._p0_cpp_FIR_0(self.ffi.cast("int",1),tmp)
