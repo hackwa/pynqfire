@@ -60,8 +60,8 @@ void cpp_FIR(data_t x, data_t *ret)
 #include <stdio.h>
 #include <stdlib.h>
 #include "cf_stub.h"
-extern void _p0_cpp_FIR_0(data_t x, data_t * ret);
-void _p0_cpp_FIR_0(data_t x, data_t * ret)
+extern "C" void _p0_cpp_FIR_0(data_t x, data_t * ret);
+extern "C" void _p0_cpp_FIR_0(data_t x, data_t * ret)
 {
   switch_to_next_partition(0);
   int start_seq[3];

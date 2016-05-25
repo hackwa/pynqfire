@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<xd:data xmlns:xd="http://www.xilinx.com/xd">
-  <xd:source name="cpp_FIR_test.cpp" compiler="g++" objfile="src/cpp_FIR_test.o" srcpath="/home/hackwad/workspace/filter/src" flags="-I/home/hackwad/workspace/filter/src -I/home/hackwad/workspace/filter/src -I/home/hackwad/workspace/filter/src/platform -Wall -O0 -g -fmessage-length=0 -MMD -MP -D __SDSCC__"/>
-</xd:data>
