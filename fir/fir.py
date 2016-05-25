@@ -18,7 +18,6 @@ class fir():
         self.ffi = cffi.FFI()
         self.lib = self.ffi.dlopen(self.libfile)
         self.ffi.cdef("void _p0_cpp_FIR_0(int x, int * ret);")
-        self.ffi.cdef("void _Z13_p0_cpp_FIR_0iPi(int x, int * ret);")
 
     def getResponse(self,datain = [0] * 85):
         dlen = len(datain)
