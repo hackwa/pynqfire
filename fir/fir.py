@@ -32,16 +32,49 @@ from fir import general_const
 from pynq import Overlay
 
 class fir():
+    """Class which controls fir filter hardware
+
+    Attributes
+    ----------
+    bitfile : str
+        Absolute path of bitstream file
+    libfile : str
+        Absolute path of shared library
+    response: list
+        Filter output
+    nshift_reg : int
+        Number of shift regs on hardware
+    overlay : Overlay
+        Gives access to bitstream overlay
+
+    """
+
     def __init__(self):
         self.bitfile = general_const.BITFILE
         self.libfile = general_const.LIBRARY
         self.response = []
         self.nshift_reg = 85
+        self.overlay = None
 
     def __version__(self):
         return "0.1"
 
     def initHw(self):
+    """Initialize Hardware
+
+        Downloads the bitstream onto hardware using overlay.
+        Reads the Shared Object and initializes CFFI.
+        Always run this before performing any operations.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+
+        """
         self.overlay = Overlay(self.bitfile)
         self.overlay.download()
         self.ffi = cffi.FFI()
@@ -49,19 +82,51 @@ class fir():
         self.ffi.cdef("void _p0_cpp_FIR_0(int x, int * ret);")
 
     def getResponse(self,datain = [0] * 85):
+    """Send input to hardware and get response
+
+        This method takes samples of data and then processes
+        them on hardware. At the end, it resets the FIR Shift
+        Registers.
+
+        Parameters
+        ----------
+        datain : list
+            A list containing input samples
+
+        Returns
+        -------
+        None
+            Use response attribute to read output.
+
+        """
         dlen = len(datain)
         resp = self.ffi.new("int *") 
         self.response = [None] * dlen
         for i in range(dlen):
             self.lib._p0_cpp_FIR_0(self.ffi.cast("int",datain[i]),resp)
             self.response[i] = resp[0]
-        
+
         # Reset FIR Shift Regs
         tmp = self.ffi.new("int *")
         for i in range(self.nshift_reg):
             self.lib._p0_cpp_FIR_0(self.ffi.cast("int",0),tmp)
 
     def impulseResponse(self):
+    """Get impulse Response of filter
+
+        This method sends an impulse to the filter and returns
+        the output response.
+
+        Paramters
+        ---------
+        None
+
+        Returns
+        -------
+        list
+            A list containing the filter response
+
+        """
         resp = []
         tmp = self.ffi.new("int *")
         self.lib._p0_cpp_FIR_0(self.ffi.cast("int",1),tmp)
