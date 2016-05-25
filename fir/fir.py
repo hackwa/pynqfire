@@ -81,7 +81,7 @@ class fir():
         self.lib = self.ffi.dlopen(self.libfile)
         self.ffi.cdef("void _p0_cpp_FIR_0(int x, int * ret);")
 
-    def getResponse(self,datain = [0] * 85):
+    def getResponse(self,datain = [0]):
         """Send input to hardware and get response
 
         This method takes samples of data and then processes
