@@ -10,7 +10,7 @@ all:
 	$(CC) -fPIC $(INC) -c cf_stub.c
 	$(CC) -fPIC $(INC) -c portinfo.c
 	$(CPP) -fPIC $(INC)  -Wall -O3 -D __SDSOC__ -c cpp_FIR.cpp
-	$(CPP) -shared -fPIC -rdynamic $(OBJS)  -L build_linux/ -Wl,--start-group $(LIBS) -Wl,--end-group -o libfir.so
+	$(CPP) -shared -fPIC -rdynamic $(OBJS) -Wl,--start-group $(LIBS) -Wl,--end-group -o libfir.so
 
 clean:
 	rm *.o *.so 
