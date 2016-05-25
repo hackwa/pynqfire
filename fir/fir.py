@@ -74,7 +74,7 @@ class fir():
         -------
         None
 
-        """
+    """
         self.overlay = Overlay(self.bitfile)
         self.overlay.download()
         self.ffi = cffi.FFI()
@@ -98,7 +98,7 @@ class fir():
         None
             Use response attribute to read output.
 
-        """
+     """
         dlen = len(datain)
         resp = self.ffi.new("int *") 
         self.response = [None] * dlen
@@ -126,7 +126,7 @@ class fir():
         list
             A list containing the filter response
 
-        """
+    """
         resp = []
         tmp = self.ffi.new("int *")
         self.lib._p0_cpp_FIR_0(self.ffi.cast("int",1),tmp)
