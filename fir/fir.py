@@ -56,7 +56,6 @@ class fir():
         self.nshift_reg = 85
         self.overlay = None
         self.ffi = cffi.FFI()
-        self.lib = self.ffi.dlopen(self.libfile)
         self.ffi.cdef("void _p0_cpp_FIR_0(int x, int * ret);")
 
     def __version__(self):
@@ -77,6 +76,7 @@ class fir():
         None
 
         """
+        self.lib = self.ffi.dlopen(self.libfile)
         self.overlay = Overlay(self.bitfile)
         self.overlay.download()
 
