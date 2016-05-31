@@ -55,16 +55,18 @@ class fir():
         self.response = []
         self.nshift_reg = 85
         self.overlay = None
+        self.ffi = cffi.FFI()
+        self.lib = self.ffi.dlopen(self.libfile)
+        self.ffi.cdef("void _p0_cpp_FIR_0(int x, int * ret);")
 
     def __version__(self):
         return "0.1"
 
-    def initHw(self):
-        """Initialize Hardware
+    def downloadHardware(self):
+        """Download the bitstream
 
         Downloads the bitstream onto hardware using overlay.
-        Reads the Shared Object and initializes CFFI.
-        Always run this before performing any operations.
+        Also gives you access to overlay.
 
         Parameters
         ----------
@@ -77,9 +79,6 @@ class fir():
         """
         self.overlay = Overlay(self.bitfile)
         self.overlay.download()
-        self.ffi = cffi.FFI()
-        self.lib = self.ffi.dlopen(self.libfile)
-        self.ffi.cdef("void _p0_cpp_FIR_0(int x, int * ret);")
 
     def getResponse(self,datain = [0]):
         """Send input to hardware and get response
