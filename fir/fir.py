@@ -31,6 +31,8 @@ import cffi
 from fir import general_const
 from pynq import Overlay
 
+PL_LOADED = False
+
 class fir():
     """Class which controls fir filter hardware
 
@@ -40,8 +42,6 @@ class fir():
         Absolute path of bitstream file
     libfile : str
         Absolute path of shared library
-    response: list
-        Filter output
     nshift_reg : int
         Number of shift regs on hardware
     overlay : Overlay
@@ -50,13 +50,16 @@ class fir():
     """
 
     def __init__(self):
+        global PL_LOADED
         self.bitfile = general_const.BITFILE
         self.libfile = general_const.LIBRARY
-        self.response = []
         self.nshift_reg = 85
         self.overlay = None
         self.ffi = cffi.FFI()
-        self.ffi.cdef("void _p0_cpp_FIR_0(int x, int * ret);")
+        self.ffi.cdef("void _p0_cpp_FIR_0(void *din, void *dout, int dlen);")
+        if not PL_LOADED:
+                self.downloadHardware()
+                PL_LOADED = True
 
     def __version__(self):
         return "0.2"
@@ -64,7 +67,7 @@ class fir():
     def downloadHardware(self):
         """Download the bitstream
 
-        Downloads the bitstream onto hardware using overlay.
+        Downloads the bitstream onto hardware using overlay class.
         Also gives you access to overlay.
 
         Parameters
@@ -80,17 +83,24 @@ class fir():
         self.overlay = Overlay(self.bitfile)
         self.overlay.download()
 
-    def getResponse(self,datain = [0]):
+    def getResponse(self,datain,dataout,datalen):
         """Send input to hardware and get response
 
         This method takes samples of data and then processes
-        them on hardware. At the end, it resets the FIR Shift
-        Registers.
+        them on hardware. The FIR Shift can be reset at the
+        end by sending a buffer filled with zeroes. This
+        buffer needs to be at least 85 samples long.
+        
+        Note: `pynq.drivers.xlnk` class can be used to
+        allocate and cast the buffers.
 
         Parameters
         ----------
-        datain : list
-            A list containing input samples
+        datain : A physically contiguous buffer
+            containing input samples.
+        dataout : A physically contiguous buffer
+            which will hold output data.
+        datalen : Number of samples.
 
         Returns
         -------
@@ -98,39 +108,6 @@ class fir():
             Use response attribute to read output.
 
         """
-        dlen = len(datain)
-        resp = self.ffi.new("int *") 
-        self.response = [None] * dlen
-        for i in range(dlen):
-            self.lib._p0_cpp_FIR_0(self.ffi.cast("int",datain[i]),resp)
-            self.response[i] = resp[0]
-
-        # Reset FIR Shift Regs
-        tmp = self.ffi.new("int *")
-        for i in range(self.nshift_reg):
-            self.lib._p0_cpp_FIR_0(self.ffi.cast("int",0),tmp)
-
-    def impulseResponse(self):
-        """Get impulse Response of filter
-
-        This method sends an impulse to the filter and returns
-        the output response.
-
-        Paramters
-        ---------
-        None
-
-        Returns
-        -------
-        list
-            A list containing the filter response
-
-        """
-        resp = []
-        tmp = self.ffi.new("int *")
-        self.lib._p0_cpp_FIR_0(self.ffi.cast("int",1),tmp)
-        resp.append(tmp[0])
-        for i in range(self.nshift_reg):
-            self.lib._p0_cpp_FIR_0(self.ffi.cast("int",0),tmp)
-            resp.append(tmp[0])
-        return resp
+        if "cdata" not in str(datain) or "cdata" not in str(dataout):
+                raise RuntimeError("Unknown buffer type!")
+        self.lib._p0_cpp_FIR_0(datain,dataout,datalen)
