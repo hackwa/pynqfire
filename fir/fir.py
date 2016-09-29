@@ -58,13 +58,13 @@ class fir():
         self.ffi = cffi.FFI()
         self.ffi.cdef("void _p0_cpp_FIR_0(void *din, void *dout, int dlen);")
         if not PL_LOADED:
-                self.downloadHardware()
+                self.download_bitstream()
                 PL_LOADED = True
 
     def __version__(self):
         return "0.2"
 
-    def downloadHardware(self):
+    def download_bitstream(self):
         """Download the bitstream
 
         Downloads the bitstream onto hardware using overlay class.
@@ -83,7 +83,7 @@ class fir():
         self.overlay = Overlay(self.bitfile)
         self.overlay.download()
 
-    def getResponse(self,datain,dataout,datalen):
+    def get_response(self,datain,dataout,datalen):
         """Send input to hardware and get response
 
         This method takes samples of data and then processes
