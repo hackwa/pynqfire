@@ -59,7 +59,7 @@ class fir():
         self.ffi.cdef("void _p0_cpp_FIR_0(int x, int * ret);")
 
     def __version__(self):
-        return "0.1"
+        return "0.2"
 
     def downloadHardware(self):
         """Download the bitstream
