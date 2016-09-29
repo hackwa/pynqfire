@@ -31,7 +31,8 @@ import cffi
 from fir import general_const
 from pynq import Overlay
 
-PL_LOADED = False
+pl_loaded = False
+fir_overlay = None
 
 class fir():
     """Class which controls fir filter hardware
@@ -50,21 +51,21 @@ class fir():
     """
 
     def __init__(self):
-        global PL_LOADED
+        global pl_loaded
         self.bitfile = general_const.BITFILE
         self.libfile = general_const.LIBRARY
         self.nshift_reg = 85
-        self.overlay = None
-        self.ffi = cffi.FFI()
-        self.ffi.cdef("void _p0_cpp_FIR_0(void *din, void *dout, int dlen);")
-        if not PL_LOADED:
-                self.downloadHardware()
-                PL_LOADED = True
+        ffi = cffi.FFI()
+        ffi.cdef("void _p0_cpp_FIR_0(void *din, void *dout, int dlen);")
+        self.lib = ffi.dlopen(self.libfile)
+        if not pl_loaded:
+                self.download_bitstream()
+                pl_loaded = True
 
     def __version__(self):
         return "0.2"
 
-    def downloadHardware(self):
+    def download_bitstream(self):
         """Download the bitstream
 
         Downloads the bitstream onto hardware using overlay class.
@@ -79,11 +80,11 @@ class fir():
         None
 
         """
-        self.lib = self.ffi.dlopen(self.libfile)
-        self.overlay = Overlay(self.bitfile)
-        self.overlay.download()
+        global fir_overlay
+        fir_overlay = Overlay(self.bitfile)
+        fir_overlay.download()
 
-    def getResponse(self,datain,dataout,datalen):
+    def get_response(self,datain,dataout,datalen):
         """Send input to hardware and get response
 
         This method takes samples of data and then processes
