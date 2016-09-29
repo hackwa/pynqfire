@@ -62,9 +62,6 @@ class fir():
                 self.download_bitstream()
                 pl_loaded = True
 
-    def __version__(self):
-        return "0.2"
-
     def download_bitstream(self):
         """Download the bitstream
 
