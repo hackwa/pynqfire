@@ -53,6 +53,7 @@ ALL TIMES.
 using namespace std;
 
 #define N 85
+#define psize 1000
 
 typedef int coef_t;
 typedef int data_t;
@@ -87,6 +88,8 @@ data_T CFir<coef_T, data_T, acc_T>::operator()(data_T x) {
     data_t m;
 
     loop: for (i = N-1; i >= 0; i--) {
+#pragma HLS PIPELINE
+#pragma HLS UNROLL factor=5
         if (i == 0) {
           m = x;
           shift_reg[0] = x;
@@ -112,6 +115,9 @@ ostream& operator<<(ostream& o, const CFir<coef_T, data_T, acc_T> &f) {
 }
 
 //data_t cpp_FIR(data_t x);
-void cpp_FIR(data_t x, data_t *ret);
+#pragma SDS data copy (x[0:datalen])
+#pragma SDS data copy (ret[0:datalen])
+#pragma SDS data access_pattern(x:SEQUENTIAL, ret:SEQUENTIAL)
+void cpp_FIR(data_t x[psize], data_t ret[psize],data_t datalen);
 
 #endif

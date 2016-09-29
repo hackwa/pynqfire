@@ -47,37 +47,45 @@ ALL TIMES.
 
 // Top-level function with class instantiated
 //data_t cpp_FIR(data_t x)
-void cpp_FIR(data_t x, data_t *ret)
+void cpp_FIR(data_t x[psize], data_t ret[psize],data_t datalen)
   {
     static CFir<coef_t, data_t, acc_t> fir1;
-
-    //cout << fir1;
-
+    for (int i=0;i<datalen;i++)
+    	ret[i] = fir1(x[i]);
     //return fir1(x);
-    *ret = fir1(x);
   }
 
 #include <stdio.h>
 #include <stdlib.h>
 #include "cf_stub.h"
-extern "C" void _p0_cpp_FIR_0(data_t x, data_t * ret);
-extern "C" void _p0_cpp_FIR_0(data_t x, data_t * ret)
+extern "C" void _p0_cpp_FIR_0(data_t x[1000], data_t ret[1000], data_t datalen);
+extern "C" void _p0_cpp_FIR_0(data_t x[1000], data_t ret[1000], data_t datalen)
 {
   switch_to_next_partition(0);
   int start_seq[3];
   start_seq[0] = 0x00000100;
-  start_seq[1] = 0x00010100;
+  start_seq[1] = 0x00010000;
   start_seq[2] = 0x00020000;
   cf_request_handle_t _p0_swinst_cpp_FIR_0_cmd;
   cf_send_i(&(_p0_swinst_cpp_FIR_0.cmd_cpp_FIR), start_seq, 3*sizeof(int), &_p0_swinst_cpp_FIR_0_cmd);
   cf_wait(_p0_swinst_cpp_FIR_0_cmd);
 
-  cf_send_i(&(_p0_swinst_cpp_FIR_0.x), &x, 4, &_p0_request_0);
 
-  cf_receive_i(&(_p0_swinst_cpp_FIR_0.ret), ret, 4, &_p0_cpp_FIR_0_num_ret, &_p0_request_1);
+#ifdef SDS_DEBUG
+  if ((datalen) * 4 != 1000*4)
+    printf("x of function cpp_FIR transfer size is different from declared size, system may hang!\n");
+  if ((datalen) * 4 != 1000*4)
+    printf("ret of function cpp_FIR transfer size is different from declared size, system may hang!\n");
+#endif
+
+  cf_send_i(&(_p0_swinst_cpp_FIR_0.x), x, (datalen) * 4, &_p0_request_0);
+  cf_send_i(&(_p0_swinst_cpp_FIR_0.datalen), &datalen, 4, &_p0_request_2);
+
+  cf_receive_i(&(_p0_swinst_cpp_FIR_0.ret), ret, (datalen) * 4, &_p0_cpp_FIR_0_num_ret, &_p0_request_1);
 
   cf_wait(_p0_request_0);
   cf_wait(_p0_request_1);
+  cf_wait(_p0_request_2);
 }
 
 

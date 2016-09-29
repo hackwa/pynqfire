@@ -1,4 +1,4 @@
-/* File: /home/hackwad/workspace/filter/SDDebug/_sds/p0/.cf_work/portinfo.c */
+/* File: C:/test6/firf_wHDMI/SDDebug/_sds/p0/.cf_work/portinfo.c */
 #include "cf_lib.h"
 #include "cf_request.h"
 #include "devreg.h"
@@ -9,8 +9,11 @@
 
 #include "xlnk_core_cf.h"
 #include "accel_info.h"
+#include "axi_dma_simple_dm.h"
 #include "axi_lite_dm.h"
 
+extern axi_dma_simple_info_t _p0_dm_0;
+extern axi_dma_simple_info_t _p0_dm_1;
 extern accel_info_t _sds__p0_cpp_FIR_0;
 
 axi_lite_info_t _p0_swinst_cpp_FIR_0_cmd_cpp_FIR_info = {
@@ -18,14 +21,21 @@ axi_lite_info_t _p0_swinst_cpp_FIR_0_cmd_cpp_FIR_info = {
   .reg_name = "0x28"
 };
 
-axi_lite_info_t _p0_swinst_cpp_FIR_0_x_info = {
-  .accel_info = &_sds__p0_cpp_FIR_0,
-  .reg_name = "0x80"
+axi_dma_simple_channel_info_t _p0_swinst_cpp_FIR_0_x_info = {
+  .dma_info = &_p0_dm_0,
+  .in_use = 0,
+  .needs_cache_flush_invalidate = 1
 };
 
-axi_lite_info_t _p0_swinst_cpp_FIR_0_ret_info = {
+axi_dma_simple_channel_info_t _p0_swinst_cpp_FIR_0_ret_info = {
+  .dma_info = &_p0_dm_1,
+  .in_use = 0,
+  .needs_cache_flush_invalidate = 1
+};
+
+axi_lite_info_t _p0_swinst_cpp_FIR_0_datalen_info = {
   .accel_info = &_sds__p0_cpp_FIR_0,
-  .reg_name = "0xC0"
+  .reg_name = "0x80"
 };
 
 struct _p0_swblk_cpp_FIR _p0_swinst_cpp_FIR_0 = {
@@ -36,14 +46,20 @@ struct _p0_swblk_cpp_FIR _p0_swinst_cpp_FIR_0 = {
 		.send_i = &axi_lite_send },
   .x = { .base = { 
 		.channel_info = &_p0_swinst_cpp_FIR_0_x_info, 
+		.open_i = &axi_dma_simple_open, 
+		.close_i = &axi_dma_simple_close },
+		.send_i = &axi_dma_simple_send_i },
+  .ret = { .base = { 
+		.channel_info = &_p0_swinst_cpp_FIR_0_ret_info, 
+		.open_i = &axi_dma_simple_open, 
+		.close_i = &axi_dma_simple_close },
+		.receive_ref_i = 0,
+		.receive_i = &axi_dma_simple_recv_i },
+  .datalen = { .base = { 
+		.channel_info = &_p0_swinst_cpp_FIR_0_datalen_info, 
 		.open_i = &axi_lite_open, 
 		.close_i = &axi_lite_close },
 		.send_i = &axi_lite_send },
-  .ret = { .base = { 
-		.channel_info = &_p0_swinst_cpp_FIR_0_ret_info, 
-		.open_i = &axi_lite_open, 
-		.close_i = &axi_lite_close },
-		.receive_i = &axi_lite_recv },
 };
 
 void _p0_cf_open_port (cf_port_base_t *port)
@@ -61,6 +77,7 @@ void _p0_cf_framework_open(int first)
   _p0_cf_open_port( &_p0_swinst_cpp_FIR_0.cmd_cpp_FIR.base );
   _p0_cf_open_port( &_p0_swinst_cpp_FIR_0.x.base );
   _p0_cf_open_port( &_p0_swinst_cpp_FIR_0.ret.base );
+  _p0_cf_open_port( &_p0_swinst_cpp_FIR_0.datalen.base );
 }
 
 void _p0_cf_framework_close(int last)
@@ -68,6 +85,7 @@ void _p0_cf_framework_close(int last)
   cf_close_i( &_p0_swinst_cpp_FIR_0.cmd_cpp_FIR, NULL);
   cf_close_i( &_p0_swinst_cpp_FIR_0.x, NULL);
   cf_close_i( &_p0_swinst_cpp_FIR_0.ret, NULL);
+  cf_close_i( &_p0_swinst_cpp_FIR_0.datalen, NULL);
   accel_close(&_sds__p0_cpp_FIR_0);
   _p0_cf_unregister(last);
 }

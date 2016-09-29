@@ -1,6 +1,6 @@
 #ifndef _SDS_DEVREG_H
 #define _SDS_DEVREG_H
-/* File: /home/hackwad/workspace/filter/SDDebug/_sds/p0/.cf_work/devreg.h */
+/* File: C:/test6/firf_wHDMI/SDDebug/_sds/p0/.cf_work/devreg.h */
 #ifdef __cplusplus
 extern "C" {
 #endif
