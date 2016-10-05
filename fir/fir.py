@@ -29,9 +29,8 @@
 
 import cffi
 from fir import general_const
-from pynq import Overlay
+from pynq import Overlay,PL
 
-pl_loaded = False
 fir_overlay = None
 
 class fir():
@@ -51,16 +50,14 @@ class fir():
     """
 
     def __init__(self):
-        global pl_loaded
         self.bitfile = general_const.BITFILE
         self.libfile = general_const.LIBRARY
         self.nshift_reg = 85
         ffi = cffi.FFI()
         ffi.cdef("void _p0_cpp_FIR_0(void *din, void *dout, int dlen);")
         self.lib = ffi.dlopen(self.libfile)
-        if not pl_loaded:
+        if PL.bitfile_name != self.bitfile:
                 self.download_bitstream()
-                pl_loaded = True
 
     def download_bitstream(self):
         """Download the bitstream
