@@ -29,6 +29,7 @@
 
 
 from setuptools import setup, find_packages
+import os
 import subprocess
 import sys
 import shutil
@@ -57,5 +58,6 @@ setup(
     package_data = {
     '' : ['*.bit','*.tcl','*.so'],
     },
+    data_files = [(os.path.join('/home/xilinx/jupyter_notebooks/fir',root.replace('notebooks/','')), [os.path.join(root, f) for f in files]) for root, dirs, files in os.walk('notebooks/')],
     description = "Run a FIR filter on Hardware"
 )
