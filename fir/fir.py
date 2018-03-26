@@ -29,7 +29,7 @@
 
 import cffi
 from fir import general_const
-from pynq import Overlay,PL
+from pynq import Overlay,PL,Xlnk
 
 fir_overlay = None
 
@@ -56,6 +56,7 @@ class fir():
         ffi = cffi.FFI()
         ffi.cdef("void _p0_cpp_FIR_1_noasync(int *x, int w[85], int *ret, int datalen)")
         self.lib = ffi.dlopen(self.libfile)
+        self.xlnk = Xlnk()
         if PL.bitfile_name != self.bitfile:
                 self.download_bitstream()
 
@@ -108,3 +109,21 @@ class fir():
         if any("cdata" not in elem for elem in [str(datain),str(win),str(dataout)]):
                 raise RuntimeError("Unknown buffer type!")
         self.lib._p0_cpp_FIR_1_noasync(datain,win,dataout,datalen)
+        return dataout
+
+   def mem_init(self, buflen):
+       """ Allocate contiguous memory buffer
+       """
+       buf = self.xlnk.cma_alloc(buflen)
+       return self.xlnk.cma_cast(buf, "int")
+
+   def reset(self):
+       """ Reset hardware state
+       """
+       din = self.mem_init(100)
+       w = self.mem_init(85)
+       dout = self.mem_init(100)
+       self.lib._p0_cpp_FIR_1_noasync(din,w,dout,100)
+       return
+	
+	
