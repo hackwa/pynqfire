@@ -1,13 +1,55 @@
+/*
+© Copyright 2013 - 2016 Xilinx, Inc. All rights reserved. 
+
+This file contains confidential and proprietary information of Xilinx, Inc. and
+is protected under U.S. and international copyright and other intellectual
+property laws.
+
+DISCLAIMER 
+This disclaimer is not a license and does not grant any rights to the materials
+distributed herewith. Except as otherwise provided in a valid license issued to
+you by Xilinx, and to the maximum extent permitted by applicable law: (1) THESE
+MATERIALS ARE MADE AVAILABLE "AS IS" AND WITH ALL FAULTS, AND XILINX HEREBY
+DISCLAIMS ALL WARRANTIES AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY,
+INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-INFRINGEMENT, OR
+FITNESS FOR ANY PARTICULAR PURPOSE; and (2) Xilinx shall not be liable (whether
+in contract or tort, including negligence, or under any other theory of
+liability) for any loss or damage of any kind or nature related to, arising
+under or in connection with these materials, including for any direct, or any
+indirect, special, incidental, or consequential loss or damage (including loss
+of data, profits, goodwill, or any type of loss or damage suffered as a result
+of any action brought by a third party) even if such damage or loss was
+reasonably foreseeable or Xilinx had been advised of the possibility of the
+same.
+
+CRITICAL APPLICATIONS
+Xilinx products are not designed or intended to be fail-safe, or for use in any
+application requiring fail-safe performance, such as life-support or safety
+devices or systems, Class III medical devices, nuclear facilities, applications
+related to the deployment of airbags, or any other applications that could lead
+to death, personal injury, or severe property or environmental damage
+(individually and collectively, "Critical Applications"). Customer assumes the
+sole risk and liability of any use of Xilinx products in Critical Applications,
+subject only to applicable laws and regulations governing limitations on product
+liability.
+
+THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS PART OF THIS FILE AT
+ALL TIMES. 
+*/
+
 #ifndef XLNK_CORE_CF_H
 #define XLNK_CORE_CF_H
+
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 // the following are for xlnkDMARegister
-#define	XLNK_DMA_TO_DEV  0
-#define	XLNK_DMA_FROM_DEV  1
-#define XLNK_BI_DIRECTIONAL  2
+#define	XLNK_DMA_TO_DEV  1
+#define	XLNK_DMA_FROM_DEV  2
+#define XLNK_BI_DIRECTIONAL  0
 // the following are from xlnk-os.h (but the DMA_TO and DMA_FROM flags are not
 #define XLNK_FLAG_COHERENT  		0x00000001
 #define XLNK_FLAG_KERNEL_BUFFER		0x00000002
@@ -19,76 +61,15 @@ extern "C" {
 #define CF_FLAG_PHYSICALLY_CONTIGUOUS  0x00000002
 #define CF_FLAG_DMAPOLLING             0x00000004
 
-typedef unsigned int xlnk_handle_t;
-
-extern void *xlnkAllocBufInternal(size_t len, int cacheable);
-extern void *xlnk_mmap2(void *phy_addr, unsigned int size, void *virt_addr);
-extern void xlnk_munmap2(void *buf);
-extern int xlnk_munmap(unsigned int virt_addr, unsigned int size);
-extern void *xlnkAllocBuf(size_t len);
-extern void xlnkFreeBuf(void *buf);
-extern unsigned int xlnkGetBufPhyAddr(void *buf);
-extern unsigned int xlnkGetBufPhyAddrAndCacheable(void *buf, int *cacheable);
-extern void xlnkFlushCache(void *buf, int size);
-extern void xlnkInvalidateCache(void *addr, int size);
-
-	
-extern int xlnkDMARequest(char *name, xlnk_handle_t *dmachan);
-extern int xlnkDMARelease(xlnk_handle_t dmachan);
-extern int xlnkDMASubmit(xlnk_handle_t dmachan,
-	void *buf, 
-	unsigned int len,
-	unsigned int dmadir,
-	unsigned int nappwords_i,
-	unsigned int *appwords_i,
-	unsigned int nappwords_o,
-	unsigned int flag,
-	xlnk_handle_t *dmahandle);
-extern int xlnkDMAWait(xlnk_handle_t dmahandle,
-	unsigned int nappwords_o,
-	unsigned int *appwords_o);
-extern int xlnkDmaRegister(char *name,
-	unsigned int id,
-	unsigned long base,
-	unsigned int size,
-	unsigned int chan_num,
-	unsigned int chan0_dir,
-	unsigned int chan0_irq,
-	unsigned int chan0_poll_mode,
-	unsigned int chan0_include_dre,
-	unsigned int chan0_data_width,
-	unsigned int chan1_dir,
-	unsigned int chan1_irq,
-	unsigned int chan1_poll_mode,
-	unsigned int chan1_include_dre,
-	unsigned int chan1_data_width);
-extern void xlnkDmaUnregister(unsigned long base);
-extern int xlnkDevRegister(char *name,
-	unsigned int id,
-	unsigned long base,
-	unsigned int size,
-	unsigned int irq0,
-	unsigned int irq1,
-	unsigned int irq2,
-	unsigned int irq3);
-void xlnkDevUnregister(unsigned long base);
-
-// return 0 if device registration has to be done, 1 if device registration has been done already and <0 for error
-int cf_xlnk_open(int);
-// second half of xlnkOpen, to be called after device registration if cfXlnkOpen returns 1
-void cf_xlnk_init(int);
-
-void xlnkClose(int, void *);
-unsigned int xlnkUioMap(int uio_id, unsigned int phys_base, unsigned int addr_range);
-void xlnkUioUnMap(unsigned int virt_base, unsigned int addr_range);
-void xlnkUioWrite32(void *base, unsigned int offset, unsigned int data);
-unsigned int xlnkUioRead32(void *base, unsigned int offset);
-unsigned long xlnkGetGlobalCounter(void);
-unsigned long long xlnkGetGlobalCounter64(void);
-void xlnkSetGlobalCounter(unsigned long long val);
+extern int cf_xlnk_open(int first);
+extern void cf_xlnk_init(int last);
+extern void xlnkCounterMap(uint64_t);
+extern int xlnkClose(unsigned int last, void* argp);
 
 #ifdef __cplusplus
 };
 #endif
 #endif
 
+
+// 67d7842dbbe25473c3c32b93c0da8047785f30d78e8a024de1b57352245f9689

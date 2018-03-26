@@ -1,18 +1,19 @@
 #ifndef _SDS_PORTINFO_H
 #define _SDS_PORTINFO_H
-/* File: C:/test6/firf_wHDMI/SDDebug/_sds/p0/.cf_work/portinfo.h */
+/* File: /home/seanf/workspace/fir-sf/Release/_sds/p0/.cf_work/portinfo.h */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 struct _p0_swblk_cpp_FIR {
   cf_port_send_t cmd_cpp_FIR;
-  cf_port_send_t x;
-  cf_port_receive_t ret;
+  cf_port_send_t x_PORTA;
+  cf_port_send_t w_PORTA;
+  cf_port_receive_t ret_PORTA;
   cf_port_send_t datalen;
 };
 
-extern struct _p0_swblk_cpp_FIR _p0_swinst_cpp_FIR_0;
+extern struct _p0_swblk_cpp_FIR _p0_swinst_cpp_FIR_1;
 void _p0_cf_framework_open(int);
 void _p0_cf_framework_close(int);
 
