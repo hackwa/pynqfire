@@ -54,7 +54,7 @@ class fir():
         self.libfile = general_const.LIBRARY
         self.nshift_reg = 85
         ffi = cffi.FFI()
-        ffi.cdef("void _p0_cpp_FIR_1_noasync(int *x, int w[85], int *ret, int datalen)")
+        ffi.cdef("void _p0_cpp_FIR_1_noasync(int *x, int w[85], int *ret, int datalen);")
         self.lib = ffi.dlopen(self.libfile)
         self.xlnk = Xlnk()
         if PL.bitfile_name != self.bitfile:
@@ -94,8 +94,8 @@ class fir():
         ----------
         datain : A physically contiguous buffer
             containing input samples.
-	win : A physically contiguous buffer
-	    containing the filter coefficients
+        win : A physically contiguous buffer
+            containing the filter coefficients
         dataout : A physically contiguous buffer
             which will hold output data.
         datalen : Number of samples.
@@ -109,21 +109,18 @@ class fir():
         if any("cdata" not in elem for elem in [str(datain),str(win),str(dataout)]):
                 raise RuntimeError("Unknown buffer type!")
         self.lib._p0_cpp_FIR_1_noasync(datain,win,dataout,datalen)
-        return dataout
+        
 
-   def mem_init(self, buflen):
-       """ Allocate contiguous memory buffer
-       """
-       buf = self.xlnk.cma_alloc(buflen)
-       return self.xlnk.cma_cast(buf, "int")
+    def mem_init(self, buflen):
+        """ Allocate contiguous memory buffer
+        """
+        buf = self.xlnk.cma_alloc(buflen)
+        return self.xlnk.cma_cast(buf, "int")
 
-   def reset(self):
-       """ Reset hardware state
-       """
-       din = self.mem_init(100)
-       w = self.mem_init(85)
-       dout = self.mem_init(100)
-       self.lib._p0_cpp_FIR_1_noasync(din,w,dout,100)
-       return
-	
-	
+    def reset(self):
+        """ Reset hardware state
+        """
+        din = self.mem_init(100)
+        w = self.mem_init(85)
+        dout = self.mem_init(100)
+        self.lib._p0_cpp_FIR_1_noasync(din,w,dout,100)
