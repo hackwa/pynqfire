@@ -87,8 +87,9 @@ ALL TIMES.
 // Top-level function with class instantiated
 void cpp_FIR(data_t x[B], coef_t w[N], data_t ret[B], data_t datalen)
   {
-    static CFir<coef_t, data_t, acc_t> fir1;
-    for (int i=0; i<datalen; i++)
+
+	static CFir<coef_t, data_t, acc_t> fir1;
+    compute: for (int i=0; i<datalen; i++)
     	ret[i] = fir1(x[i], w);
   }
 

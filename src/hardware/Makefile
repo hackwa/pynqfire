@@ -12,6 +12,12 @@ all:
 	$(CPP) -g3 -gstabs -shared -fPIC -rdynamic $(OBJSH) -Wl,--start-group $(LIBS) -Wl,--end-group -o libfir.so
 	rm *.o
 
+test:	
+	$(CC) -fPIC $(INC) -c -g3 -gstabs cf_stub.c
+	$(CC) -fPIC $(INC) -c -g3 -gstabs cpp_FIR.cpp
+	$(CC) -fPIC $(INC) -c -g3 -gstabs portinfo.c	
+	$(CPP) -fPIC $(INC) cpp_FIR.o portinfo.o cf_stub.o $(LIBS) -o test cpp_FIR_test.cpp
+	rm *.o
+	
 clean:
-	rm -f *.so *.o test
-
+	rm -f *.so *.o test *.dat

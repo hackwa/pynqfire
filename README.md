@@ -5,7 +5,7 @@ This package encapsulates everything needed to run a FIR filter on the FPGA Fabr
 http://www.pynq.io
 
 ## Installing
-sudo pip install --upgrade 'git+https://github.com/hackwa/pynqfire@master#egg=fir'
+sudo pip3.6 install --upgrade 'git+https://github.com/hackwa/pynqfire@master#egg=fir'
 
 ## Usage
 Checkout 'notebooks' Folder
@@ -14,4 +14,4 @@ Checkout 'notebooks' Folder
 Date | README Version | Description
 -----|----------------|------------
 Sep2016|1.0|Initial FIR filter
-Mar2018|2.0|Updated with Configurable FIR Coefficients
+Mar2018|2.0|Updated with configurable FIR coefficients

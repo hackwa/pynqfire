@@ -92,7 +92,7 @@ ALL TIMES.
 using namespace std;
 
 #define N 85
-#define B 1000
+#define B 500000
 
 typedef int coef_t;
 typedef int data_t;
@@ -103,7 +103,6 @@ typedef int acc_t;
 template<class coef_T, class data_T, class acc_T>
 class CFir {
 protected:
-  //static const coef_T c[N];
   data_T shift_reg[N-1];
 private:
 public:
@@ -117,35 +116,33 @@ public:
 // FIR main algorithm
 template<class coef_T, class data_T, class acc_T>
 data_T CFir<coef_T, data_T, acc_T>::operator()(data_T x, coef_T w[N]) {
-    int i;
-    acc_t acc = 0;
-    data_t m;
+#pragma HLS PIPELINE II=1
+#pragma HLS ARRAY_PARTITION partition variable=shift_reg dim=1
+#pragma HLS ARRAY_PARTITION partition variable=w complete dim=1
 
-    loop: for (i = N-1; i >= 0; i--) {
-        if (i == 0) {
-          m = x;
-          shift_reg[0] = x;
-        } else {
-          m = shift_reg[i-1];
-          if (i != (N-1))
-            shift_reg[i] = shift_reg[i - 1];
-        }
-        acc += m * w[i];
-    }
-    return acc;
+	int i;
+	acc_t acc = 0;
+	data_t m;
+
+	loop: for (i = N-1; i >= 0; i--) {
+	#pragma HLS UNROLL
+		if (i == 0) {
+			m = x;
+			shift_reg[0] = x;
+		} else {
+			m = shift_reg[i-1];
+			if (i != (N-1) )
+				shift_reg[i] = shift_reg[i - 1];
+		}
+		acc += m * w[i];
+	}
+	return acc;
 }
 
-// Operator for displaying results
-template<class coef_T, class data_T, class acc_T>
-ostream& operator<<(ostream& o, const CFir<coef_T, data_T, acc_T> &f) {
-    for (int i = 0; i < (sizeof(f.shift_reg)/sizeof(data_T)); i++)
-      {
-        o << "shift_reg[" << i << "]= " << f.shift_reg[i] << endl;
-      }
-    o << "______________" << endl;
-    return o;
-}
-
+#pragma SDS data access_pattern(x:SEQUENTIAL, ret:SEQUENTIAL)
+#pragma SDS data copy(x[0:datalen], ret[0:datalen])
+#pragma SDS data data_mover(x:AXIDMA_SIMPLE, w:AXIDMA_SIMPLE, ret:AXIDMA_SIMPLE)
+#pragma SDS data mem_attribute(x:PHYSICAL_CONTIGUOUS, w:PHYSICAL_CONTIGUOUS, ret:PHYSICAL_CONTIGUOUS)
 void cpp_FIR(data_t x[B], coef_t w[N], data_t ret[B], data_t datalen);
 
 #endif

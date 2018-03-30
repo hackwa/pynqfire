@@ -7,9 +7,9 @@ extern "C" {
 
 struct _p0_swblk_cpp_FIR {
   cf_port_send_t cmd_cpp_FIR;
-  cf_port_send_t x_PORTA;
+  cf_port_send_t x;
   cf_port_send_t w_PORTA;
-  cf_port_receive_t ret_PORTA;
+  cf_port_receive_t ret;
   cf_port_send_t datalen;
 };
 

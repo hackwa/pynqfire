@@ -7,7 +7,7 @@
 #include "stdio.h"  // for printf
 #include "xlnk_core_cf.h"
 #include "accel_info.h"
-#include "axi_dma_sg_dm.h"
+#include "axi_dma_simple_dm.h"
 #include "axi_lite_dm.h"
 #include "sysport_info.h"
 
@@ -19,7 +19,7 @@ sysport_info_t _sds_sysport_p0_ps7_0_S_AXI_ACP = {
 };
 
 accel_info_t _sds__p0_cpp_FIR_1 = {
-  .device_id = 0,
+  .device_id = 3,
   .phys_base_addr = 0x83c00000,
   .addr_range = 0x10000,
   .func_name = "cpp_FIR_1",
@@ -27,55 +27,51 @@ accel_info_t _sds__p0_cpp_FIR_1 = {
   .irq = 0,
 };
 
-axi_dma_sg_info_t _p0_dm_0 = {
+axi_dma_simple_info_t _p0_dm_0 = {
   .name = "dm_0",
   .phys_base_addr = 0x80400000,
   .addr_range = 0x10000,
-  .seq_num = 0,
-  .chan_data[0].valid = 1,
-  .chan_data[0].name = "dm_0:0",
-  .chan_data[0].dir = XLNK_DMA_TO_DEV,
-  .chan_data[0].irq = 62,
-  .chan_data[0].data_sysport = &_sds_sysport_p0_ps7_0_S_AXI_ACP,
-  .chan_data[0].data_width = 64,
-  .chan_data[1].valid = 1,
-  .chan_data[1].name = "dm_0:1",
-  .chan_data[1].dir = XLNK_DMA_FROM_DEV,
-  .chan_data[1].irq = 63,
-  .chan_data[1].data_sysport = &_sds_sysport_p0_ps7_0_S_AXI_ACP,
-  .chan_data[1].data_width = 64,
+  .device_id = 0,
+  .dir = XLNK_DMA_TO_DEV,
+  .irq = -1,
+  .data_sysport = &_sds_sysport_p0_ps7_0_S_AXI_ACP,
+  .data_width = 64,
 };
 
-int _p0_swinst_cpp_FIR_1_cmd_cpp_FIR_sg_list[] = {0x80c, 0x8};
+axi_dma_simple_info_t _p0_dm_1 = {
+  .name = "dm_1",
+  .phys_base_addr = 0x80410000,
+  .addr_range = 0x10000,
+  .device_id = 1,
+  .dir = XLNK_DMA_TO_DEV,
+  .irq = -1,
+  .data_sysport = &_sds_sysport_p0_ps7_0_S_AXI_ACP,
+  .data_width = 64,
+};
+
+axi_dma_simple_info_t _p0_dm_2 = {
+  .name = "dm_2",
+  .phys_base_addr = 0x80420000,
+  .addr_range = 0x10000,
+  .device_id = 2,
+  .dir = XLNK_DMA_FROM_DEV,
+  .irq = -1,
+  .data_sysport = &_sds_sysport_p0_ps7_0_S_AXI_ACP,
+  .data_width = 64,
+};
+
+int _p0_swinst_cpp_FIR_1_cmd_cpp_FIR_sg_list[] = {0x8};
 
 axi_lite_info_t _p0_swinst_cpp_FIR_1_cmd_cpp_FIR_info = {
   .phys_base_addr = 0x83c00000,
   .data_reg_offset = _p0_swinst_cpp_FIR_1_cmd_cpp_FIR_sg_list,
-  .data_reg_sg_size = 2,
+  .data_reg_sg_size = 1,
   .write_status_reg_offset = 0x0,
   .read_status_reg_offset = 0x0,
   .config = XLNK_AXI_LITE_SG |
     XLNK_AXI_LITE_STAT_REG_READ(XLNK_AXI_LITE_STAT_REG_NOCHECK) |
     XLNK_AXI_LITE_STAT_REG_WRITE(XLNK_AXI_LITE_STAT_REG_NOCHECK),
   .acc_info = &_sds__p0_cpp_FIR_1,
-};
-
-axi_dma_sg_transaction_info_t _p0_swinst_cpp_FIR_1_x_PORTA_info = {
-  .dma_info = &_p0_dm_0,
-  .dma_channel = 0,
-  .port_id = 0,
-};
-
-axi_dma_sg_transaction_info_t _p0_swinst_cpp_FIR_1_w_PORTA_info = {
-  .dma_info = &_p0_dm_0,
-  .dma_channel = 0,
-  .port_id = 1,
-};
-
-axi_dma_sg_transaction_info_t _p0_swinst_cpp_FIR_1_ret_PORTA_info = {
-  .dma_info = &_p0_dm_0,
-  .dma_channel = 1,
-  .port_id = 0,
 };
 
 int _p0_swinst_cpp_FIR_1_datalen_sg_list[] = {0xc};
@@ -95,13 +91,13 @@ axi_lite_info_t _p0_swinst_cpp_FIR_1_datalen_info = {
 struct _p0_swblk_cpp_FIR _p0_swinst_cpp_FIR_1 = {
   .cmd_cpp_FIR = { .base = { .channel_info = &_p0_swinst_cpp_FIR_1_cmd_cpp_FIR_info}, 
     .send_i = &axi_lite_send },
-  .x_PORTA = { .base = { .channel_info = &_p0_swinst_cpp_FIR_1_x_PORTA_info}, 
-    .send_i = &axi_dma_sg_send_i },
-  .w_PORTA = { .base = { .channel_info = &_p0_swinst_cpp_FIR_1_w_PORTA_info}, 
-    .send_i = &axi_dma_sg_send_i },
-  .ret_PORTA = { .base = { .channel_info = &_p0_swinst_cpp_FIR_1_ret_PORTA_info}, 
+  .x = { .base = { .channel_info = &_p0_dm_0},
+    .send_i = &axi_dma_simple_send_i },
+  .w_PORTA = { .base = { .channel_info = &_p0_dm_1},
+    .send_i = &axi_dma_simple_send_i },
+  .ret = { .base = { .channel_info = &_p0_dm_2},
     .receive_ref_i = 0,
-    .receive_i = &axi_dma_sg_recv_i },
+    .receive_i = &axi_dma_simple_recv_i },
   .datalen = { .base = { .channel_info = &_p0_swinst_cpp_FIR_1_datalen_info}, 
     .send_i = &axi_lite_send },
 };
@@ -123,13 +119,15 @@ void _p0_cf_framework_open(int first)
   }
   cf_get_current_context();
   sysport_open(&_sds_sysport_p0_ps7_0_S_AXI_ACP);
-  axi_dma_sg_open(&_p0_dm_0);
+  axi_dma_simple_open(&_p0_dm_0);
+  axi_dma_simple_open(&_p0_dm_1);
+  axi_dma_simple_open(&_p0_dm_2);
   axi_lite_open(&_p0_swinst_cpp_FIR_1_cmd_cpp_FIR_info);
   axi_lite_open(&_p0_swinst_cpp_FIR_1_datalen_info);
   _sds__p0_cpp_FIR_1.arg_dm_id[0] = _p0_swinst_cpp_FIR_1_cmd_cpp_FIR_info.dm_id;
-  _sds__p0_cpp_FIR_1.arg_dm_id[1] = _p0_swinst_cpp_FIR_1_x_PORTA_info.dma_info->chan_data[_p0_swinst_cpp_FIR_1_x_PORTA_info.dma_channel].dm_id;
-  _sds__p0_cpp_FIR_1.arg_dm_id[2] = _p0_swinst_cpp_FIR_1_w_PORTA_info.dma_info->chan_data[_p0_swinst_cpp_FIR_1_w_PORTA_info.dma_channel].dm_id;
-  _sds__p0_cpp_FIR_1.arg_dm_id[3] = _p0_swinst_cpp_FIR_1_ret_PORTA_info.dma_info->chan_data[_p0_swinst_cpp_FIR_1_ret_PORTA_info.dma_channel].dm_id;
+  _sds__p0_cpp_FIR_1.arg_dm_id[1] = _p0_dm_0.dm_id;
+  _sds__p0_cpp_FIR_1.arg_dm_id[2] = _p0_dm_1.dm_id;
+  _sds__p0_cpp_FIR_1.arg_dm_id[3] = _p0_dm_2.dm_id;
   _sds__p0_cpp_FIR_1.arg_dm_id[4] = _p0_swinst_cpp_FIR_1_datalen_info.dm_id;
   _sds__p0_cpp_FIR_1.arg_dm_id_count = 5;
   accel_open(&_sds__p0_cpp_FIR_1);
@@ -138,7 +136,9 @@ void _p0_cf_framework_open(int first)
 void _p0_cf_framework_close(int last)
 {
   accel_close(&_sds__p0_cpp_FIR_1);
-  axi_dma_sg_close(&_p0_dm_0);
+  axi_dma_simple_close(&_p0_dm_0);
+  axi_dma_simple_close(&_p0_dm_1);
+  axi_dma_simple_close(&_p0_dm_2);
   axi_lite_close(&_p0_swinst_cpp_FIR_1_cmd_cpp_FIR_info);
   axi_lite_close(&_p0_swinst_cpp_FIR_1_datalen_info);
   sysport_close(&_sds_sysport_p0_ps7_0_S_AXI_ACP);
