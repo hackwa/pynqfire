@@ -39,7 +39,7 @@ ALL TIMES.
 
 /*******************************************************************************
 Vendor: Xilinx 
-Associated Filename: cpp_FIR.cpp
+Associated Filename: cpp_FIR_test.cpp
 Purpose:Vivado HLS Coding Style example 
 Device: All 
 Revision History: May 30, 2008 - initial release
@@ -73,7 +73,7 @@ application requiring fail-safe performance, such as life-support or safety
 devices or systems, Class III medical devices, nuclear facilities, applications 
 related to the deployment of airbags, or any other applications that could lead 
 to death, personal injury, or severe property or environmental damage 
-(individually and collectively, "Critical Applications"). Customer assumes the 
+(individually and collectively, "Critical Applications"). Customer asresultes the 
 sole risk and liability of any use of Xilinx products in Critical Applications, 
 subject only to applicable laws and regulations governing limitations on product 
 liability. 
@@ -82,47 +82,106 @@ THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS PART OF THIS FILE AT
 ALL TIMES.
 
 *******************************************************************************/
+#include <stdint.h>
+#include <stdlib.h>
+#include <sds_lib.h>
 #include "cpp_FIR.h"
 
-// Top-level function with class instantiated
-void cpp_FIR(data_t x[B], coef_t w[N], data_t ret[B], data_t datalen)
-  {
-
-	static CFir<coef_t, data_t, acc_t> fir1;
-    compute: for (int i=0; i<datalen; i++)
-    	ret[i] = fir1(x[i], w);
-  }
-
-#include "cf_stub.h"
-extern "C" void _p0_cpp_FIR_1_noasync(data_t x[500000], coef_t w[85], data_t ret[500000], data_t datalen);
-extern "C" void _p0_cpp_FIR_1_noasync(data_t x[500000], coef_t w[85], data_t ret[500000], data_t datalen)
+class perf_counter
 {
-  switch_to_next_partition(0);
-  int start_seq[1];
-  start_seq[0] = 0;
-  cf_request_handle_t _p0_swinst_cpp_FIR_1_cmd;
-  cf_send_i(&(_p0_swinst_cpp_FIR_1.cmd_cpp_FIR), start_seq, 1 * sizeof(int), &_p0_swinst_cpp_FIR_1_cmd);
-  cf_wait(_p0_swinst_cpp_FIR_1_cmd);
+public:
+     uint64_t tot, cnt, calls;
+     perf_counter() : tot(0), cnt(0), calls(0) {};
+     inline void reset() { tot = cnt = calls = 0; }
+     inline void start() { cnt = sds_clock_counter(); calls++; };
+     inline void stop() { tot += (sds_clock_counter() - cnt); };
+     inline uint64_t avg_cpu_cycles() { return ((tot+(calls>>1)) / calls); };
+};
 
-
-#ifdef SDS_DEBUG
-  if ((datalen) * 4 != 500000*4)
-    printf("x of function cpp_FIR transfer size is different from declared size, system may hang!\n");
-  if ((datalen) * 4 != 500000*4)
-    printf("ret of function cpp_FIR transfer size is different from declared size, system may hang!\n");
-#endif
-
-  cf_send_i(&(_p0_swinst_cpp_FIR_1.x), x, (datalen) * 4, &_p0_request_0);
-  cf_send_i(&(_p0_swinst_cpp_FIR_1.w_PORTA), w, 340, &_p0_request_1);
-  cf_send_i(&(_p0_swinst_cpp_FIR_1.datalen), &datalen, 4, &_p0_request_3);
-
-  cf_receive_i(&(_p0_swinst_cpp_FIR_1.ret), ret, (datalen) * 4, &_p0_cpp_FIR_1_noasync_num_ret, &_p0_request_2);
-
-  cf_wait(_p0_request_0);
-  cf_wait(_p0_request_1);
-  cf_wait(_p0_request_2);
-  cf_wait(_p0_request_3);
+static void 
+fir_sw(data_t x[B], coef_t w[N], data_t ret[B], data_t datalen)
+{
+	static CFir<coef_t, data_t, acc_t> fir1;
+	for (int i=0; i<datalen; i++)
+	    ret[i] = fir1(x[i], w);
 }
 
+void _p0_cpp_FIR_1_noasync(data_t x[500000], coef_t w[85], data_t ret[500000], data_t datalen);
+static void 
+reset_firs(data_t xhw[B], data_t output[B], coef_t w[N], data_t output_sw[B], data_t datalen)
+{
+     _p0_cpp_FIR_1_noasync(xhw, w, output, datalen);
+     fir_sw(xhw, w, output_sw, datalen);
+}
+
+void _p0_cpp_FIR_1_noasync(data_t x[500000], coef_t w[85], data_t ret[500000], data_t datalen);
+int main()
+{
+
+	coef_t *w;
+	data_t *x, *xhw, *output, *output_sw;
+
+	w = (coef_t *)sds_alloc(int(N*sizeof(coef_t)));
+	x = (data_t *)sds_alloc(int(B*sizeof(data_t)));
+	xhw = (data_t *)sds_alloc(int(B*sizeof(data_t)));
+	output = (data_t *)sds_alloc(int(B*sizeof(data_t)));
+	output_sw = (data_t *)malloc(int(B*sizeof(data_t)));
+	data_t datalen = 10000;
+	
+	// Load coeffs from file
+	#include "coef.txt"
+
+	// NOTE: HLS hardware leaves state in the IP, so must
+	//       explicitly reset the shift register
+	reset_firs(xhw, output, w, output_sw, datalen);
+
+	//create input data
+	for (int i = 0; i < datalen; i++) {
+		x[i] = i;
+	}
+
+
+	perf_counter hw_ctr, sw_ctr;
+
+	hw_ctr.start();
+	_p0_cpp_FIR_1_noasync(x, w, output, datalen);  // compute
+	hw_ctr.stop();
+	sw_ctr.start();
+	fir_sw(x, w, output_sw, datalen);
+	sw_ctr.stop();
+
+	for (int i = 0; i < datalen; i++) {
+		if ( i<= 20 ) {
+			std::cout << output[i] << ";" << output_sw[i] << std::endl;
+		}
+		if (output[i] != output_sw[i]) {
+			std::cout << "Mismatch: cpp_FIR(" << i << ") = "
+					  << output[i] << ";  fir_sw(" << i << ") = "
+					  << output_sw[i] << std::endl;
+			std::cout << "Test failed" << std::endl;
+			return -1;
+		}
+	}
+	std::cout << "Test passed" << std::endl;
+
+	uint64_t sw_cycles = sw_ctr.avg_cpu_cycles();
+	uint64_t hw_cycles = hw_ctr.avg_cpu_cycles();
+	double speedup = (double) sw_cycles / (double) hw_cycles;
+
+	std::cout << "Average number of CPU cycles running CFir in software: "
+	   << sw_cycles << std::endl;
+	std::cout << "Average number of CPU cycles running CFir in hardware: "
+	   << hw_cycles << std::endl;
+	std::cout << "Speed up: " << speedup << std::endl;
+
+	sds_free(x);
+	sds_free(w);
+	sds_free(xhw);
+	sds_free(output);
+	free(output_sw);
+
+	return 0;
+
+  }
 
 

@@ -29,7 +29,7 @@
 
 import cffi
 from fir import general_const
-from pynq import Overlay,PL
+from pynq import Overlay,PL,Xlnk
 
 fir_overlay = None
 
@@ -54,8 +54,9 @@ class fir():
         self.libfile = general_const.LIBRARY
         self.nshift_reg = 85
         ffi = cffi.FFI()
-        ffi.cdef("void _p0_cpp_FIR_0(void *din, void *dout, int dlen);")
+        ffi.cdef("void _p0_cpp_FIR_1_noasync(int *x, int w[85], int *ret, int datalen);")
         self.lib = ffi.dlopen(self.libfile)
+        self.xlnk = Xlnk()
         if PL.bitfile_name != self.bitfile:
                 self.download_bitstream()
 
@@ -78,7 +79,7 @@ class fir():
         fir_overlay = Overlay(self.bitfile)
         fir_overlay.download()
 
-    def get_response(self,datain,dataout,datalen):
+    def get_response(self,datain,win,dataout,datalen):
         """Send input to hardware and get response
 
         This method takes samples of data and then processes
@@ -93,6 +94,8 @@ class fir():
         ----------
         datain : A physically contiguous buffer
             containing input samples.
+        win : A physically contiguous buffer
+            containing the filter coefficients
         dataout : A physically contiguous buffer
             which will hold output data.
         datalen : Number of samples.
@@ -103,6 +106,21 @@ class fir():
             Use response attribute to read output.
 
         """
-        if "cdata" not in str(datain) or "cdata" not in str(dataout):
+        if any("cdata" not in elem for elem in [str(datain),str(win),str(dataout)]):
                 raise RuntimeError("Unknown buffer type!")
-        self.lib._p0_cpp_FIR_0(datain,dataout,datalen)
+        self.lib._p0_cpp_FIR_1_noasync(datain,win,dataout,datalen)
+        
+
+    def mem_init(self, buflen):
+        """ Allocate contiguous memory buffer
+        """
+        buf = self.xlnk.cma_alloc(buflen)
+        return self.xlnk.cma_cast(buf, "int")
+
+    def reset(self):
+        """ Reset hardware state
+        """
+        din = self.mem_init(100)
+        w = self.mem_init(85)
+        dout = self.mem_init(100)
+        self.lib._p0_cpp_FIR_1_noasync(din,w,dout,100)

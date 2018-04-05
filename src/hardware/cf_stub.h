@@ -9,8 +9,9 @@
 extern cf_request_handle_t _p0_request_0;
 extern cf_request_handle_t _p0_request_1;
 extern cf_request_handle_t _p0_request_2;
+extern cf_request_handle_t _p0_request_3;
 
-extern size_t _p0_cpp_FIR_0_num_ret;
+extern unsigned int _p0_cpp_FIR_1_noasync_num_ret;
 
 
 

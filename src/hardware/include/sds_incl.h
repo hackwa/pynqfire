@@ -1,13 +1,54 @@
+/*
+© Copyright 2013 - 2016 Xilinx, Inc. All rights reserved. 
+
+This file contains confidential and proprietary information of Xilinx, Inc. and
+is protected under U.S. and international copyright and other intellectual
+property laws.
+
+DISCLAIMER 
+This disclaimer is not a license and does not grant any rights to the materials
+distributed herewith. Except as otherwise provided in a valid license issued to
+you by Xilinx, and to the maximum extent permitted by applicable law: (1) THESE
+MATERIALS ARE MADE AVAILABLE "AS IS" AND WITH ALL FAULTS, AND XILINX HEREBY
+DISCLAIMS ALL WARRANTIES AND CONDITIONS, EXPRESS, IMPLIED, OR STATUTORY,
+INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, NON-INFRINGEMENT, OR
+FITNESS FOR ANY PARTICULAR PURPOSE; and (2) Xilinx shall not be liable (whether
+in contract or tort, including negligence, or under any other theory of
+liability) for any loss or damage of any kind or nature related to, arising
+under or in connection with these materials, including for any direct, or any
+indirect, special, incidental, or consequential loss or damage (including loss
+of data, profits, goodwill, or any type of loss or damage suffered as a result
+of any action brought by a third party) even if such damage or loss was
+reasonably foreseeable or Xilinx had been advised of the possibility of the
+same.
+
+CRITICAL APPLICATIONS
+Xilinx products are not designed or intended to be fail-safe, or for use in any
+application requiring fail-safe performance, such as life-support or safety
+devices or systems, Class III medical devices, nuclear facilities, applications
+related to the deployment of airbags, or any other applications that could lead
+to death, personal injury, or severe property or environmental damage
+(individually and collectively, "Critical Applications"). Customer assumes the
+sole risk and liability of any use of Xilinx products in Critical Applications,
+subject only to applicable laws and regulations governing limitations on product
+liability.
+
+THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS PART OF THIS FILE AT
+ALL TIMES. 
+*/
+
 #ifndef D_apf_incl
 #define D_apf_incl
+
 /* To simplify the includes for c-callable IP libraries:
- *   this include file contains all the definitions from cf_lib.h and
- *   some selected defintions from sds_lib.h
+ * this include file contains all the definitions from cf_lib.h and
+ * some selected defintions from sds_lib.h
  */
 #ifdef __cplusplus
 extern "C" {
 #endif
 /* definitions from cf_lib.h */
+
 typedef int cf_status_t;
 typedef struct cf_context_struct cf_context_t;
 typedef struct cf_request_handle_struct *cf_request_handle_t;
@@ -18,7 +59,6 @@ typedef struct cf_port_send_struct cf_port_send_t;
 typedef struct cf_port_addressable_struct cf_port_addressable_t;
 typedef struct cf_alloc_attr_struct cf_alloc_attr_t;
 typedef struct cf_iovec_struct cf_iovec_t;
-
 
 /*
  * Error codes
@@ -69,19 +109,19 @@ struct cf_port_receive_struct {
 	int (*receive_ref_i)(
 		cf_port_receive_t *port,
 		void **buf,
-		size_t *len,
+		unsigned int *len,
 		cf_request_handle_t *request);
 	int (*receive_i)(
 		cf_port_receive_t *port,
 		void *buf,
-		size_t len,
-		size_t *bytes_received,
+		unsigned int len,
+		unsigned int *bytes_received,
 		cf_request_handle_t *request);
 	int (*receive_iov_i)(
 		cf_port_receive_t *port,
 		cf_iovec_t *iov,
 		unsigned int iovcnt,
-		size_t *bytes_received,
+		unsigned int *bytes_received,
 		cf_request_handle_t *request);
 };
 
@@ -93,13 +133,13 @@ struct cf_port_send_struct {
 	cf_port_base_t base;
  	int (*send_ref_i)(
 		cf_port_send_t *port,
-		void *buf,
-		size_t len,
+		const void *buf,
+		unsigned int len,
 		cf_request_handle_t *request);
  	int (*send_i)(
 		cf_port_send_t *port,
-		void *buf,
-		size_t len,
+		const void *buf,
+		unsigned int len,
 		cf_request_handle_t *request);
 	int (*send_iov_i)(
 		cf_port_send_t *port,
@@ -116,29 +156,29 @@ struct cf_port_addressable_struct {
 	cf_port_base_t base;
 	int (*getbuf_i)(
 		cf_port_addressable_t *port,
-		size_t offset,
+		unsigned int offset,
 		void *buf,
-		size_t len,
+		unsigned int len,
 		cf_request_handle_t *request);
 	int (*setbuf_i)(
 		cf_port_addressable_t *port,
-		size_t offset,
+		unsigned int offset,
 		void *buf,
-		size_t len,
+		unsigned int len,
 		cf_request_handle_t *request);
 	int (*alloc_i)(
 		cf_port_addressable_t *port,
-		size_t size,
-		size_t *offset,
+		unsigned int size,
+		unsigned int *offset,
 		cf_request_handle_t *request);
 	int (*free_i)(
 		cf_port_addressable_t *port,
-		size_t offset,
+		unsigned int offset,
 		cf_request_handle_t *request);
 	void *(*map)(
 		cf_port_addressable_t *port,
-		size_t offset,
-		size_t size,
+		unsigned int offset,
+		unsigned int size,
 		int flags);
 };
 
@@ -170,9 +210,9 @@ struct cf_port_addressable_struct {
  */
 struct cf_iovec_struct {
 	void *buf;
-	size_t offset;
-	size_t stride;
-	size_t elements;
+	unsigned int offset;
+	unsigned int stride;
+	unsigned int elements;
 };
 
 
@@ -242,8 +282,8 @@ extern int cf_close_internal(
  */
 extern int cf_send_ref_i(
 	cf_port_send_t *port,
-	void *buf,
-	size_t len,
+	const void *buf,
+	unsigned int len,
 	cf_request_handle_t *request);
 
 
@@ -257,8 +297,8 @@ extern int cf_send_ref_i(
  */
 extern int cf_send_ref(
 	cf_port_send_t *port,
-	void *buf,
-	size_t len);
+	const void *buf,
+	unsigned int len);
 
 
 /*
@@ -269,11 +309,11 @@ extern int cf_send_ref(
  */
 extern int cf_send_i(
 	cf_port_send_t *port,
-	void *buf,
-	size_t len,
+	const void *buf,
+	unsigned int len,
 	cf_request_handle_t *request);
 
-
+	
 /*
  * Synchronous send buffer to stream.
  *
@@ -281,8 +321,8 @@ extern int cf_send_i(
  */
 extern int cf_send(
 	cf_port_send_t *port,
-	void *buf,
-	size_t len);
+	const void *buf,
+	unsigned int len);
 
 
 /*
@@ -295,10 +335,10 @@ extern int cf_send(
  */
 extern int cf_send_2d_i(
 	cf_port_send_t *port,
-	void *buf,
-	size_t len,
-	size_t stride,
-	size_t count,
+	const void *buf,
+	unsigned int len,
+	unsigned int stride,
+	unsigned int count,
 	cf_request_handle_t *request);
 
 
@@ -311,10 +351,10 @@ extern int cf_send_2d_i(
  */
 extern int cf_send_2d(
 	cf_port_send_t *port,
-	void *buf,
-	size_t len,
-	size_t stride,
-	size_t count);
+	const void *buf,
+	unsigned int len,
+	unsigned int stride,
+	unsigned int count);
 
 
 /*
@@ -352,8 +392,8 @@ extern int cf_send_iov(
 extern int cf_receive_i(
 	cf_port_receive_t *port,
 	void *buf,
-	size_t len,
-	size_t *bytes_received,
+	unsigned int len,
+	unsigned int *bytes_received,
 	cf_request_handle_t *request);
 
 
@@ -365,8 +405,8 @@ extern int cf_receive_i(
 extern int cf_receive(
 	cf_port_receive_t *port,
 	void *buf,
-	size_t len,
-	size_t *bytes_received);
+	unsigned int len,
+	unsigned int *bytes_received);
 
 
 /*
@@ -382,7 +422,7 @@ extern int cf_receive(
 extern int cf_receive_ref_i(
 	cf_port_receive_t *port,
 	void **buf,
-	size_t *len,
+	unsigned int *len,
 	cf_request_handle_t *request);
 
 
@@ -398,7 +438,7 @@ extern int cf_receive_ref_i(
 extern int cf_receive_ref(
 	cf_port_receive_t *port,
 	void **buf,
-	size_t *len,
+	unsigned int *len,
 	cf_request_handle_t *request);
 
 
@@ -413,10 +453,10 @@ extern int cf_receive_ref(
 extern int cf_receive_2d_i(
 	cf_port_receive_t *port,
 	void *buf,
-	size_t len,
-	size_t stride,
-	size_t count,
-	size_t *bytes_received,
+	unsigned int len,
+	unsigned int stride,
+	unsigned int count,
+	unsigned int *bytes_received,
 	cf_request_handle_t *request);
 
 
@@ -430,10 +470,10 @@ extern int cf_receive_2d_i(
 extern int cf_receive_2d(
 	cf_port_receive_t *port,
 	void *buf,
-	size_t len,
-	size_t stride,
-	size_t count,
-	size_t *bytes_received);
+	unsigned int len,
+	unsigned int stride,
+	unsigned int count,
+	unsigned int *bytes_received);
 
 
 /*
@@ -447,7 +487,7 @@ extern int cf_receive_iov_i(
 	cf_port_receive_t *port,
 	cf_iovec_t *iov,
 	unsigned int iovcnt,
-	size_t *bytes_received,
+	unsigned int *bytes_received,
 	cf_request_handle_t *request);
 
 
@@ -461,7 +501,7 @@ extern int cf_receive_iov(
 	cf_port_receive_t *port,
 	cf_iovec_t *iov,
 	unsigned int iovcnt,
-	size_t *bytes_received);
+	unsigned int *bytes_received);
 
 
 /*
@@ -476,8 +516,8 @@ extern int cf_receive_iov(
  */
 extern int cf_addressable_alloc_i(
 	cf_port_addressable_t *port,
-	size_t size,
-	size_t *offset,
+	unsigned int size,
+	unsigned int *offset,
 	cf_request_handle_t *request);
 
 
@@ -493,8 +533,8 @@ extern int cf_addressable_alloc_i(
  */
 extern int cf_addressable_alloc(
 	cf_port_addressable_t *port,
-	size_t size,
-	size_t *offset);
+	unsigned int size,
+	unsigned int *offset);
 
 
 /*
@@ -510,7 +550,7 @@ extern int cf_addressable_alloc(
  */
 extern int cf_addressable_free_i(
 	cf_port_addressable_t *port,
-	size_t offset,
+	unsigned int offset,
 	cf_request_handle_t *request);
 
 
@@ -526,7 +566,7 @@ extern int cf_addressable_free_i(
  */
 extern int cf_addressable_free(
 	cf_port_addressable_t *port,
-	size_t offset);
+	unsigned int offset);
 
 
 /*
@@ -540,9 +580,9 @@ extern int cf_addressable_free(
  */
 extern int cf_getbuf_i(
 	cf_port_addressable_t *port,
-	size_t offset,
+	unsigned int offset,
 	void *buf,
-	size_t len,
+	unsigned int len,
 	cf_request_handle_t *request);
 
 
@@ -554,9 +594,9 @@ extern int cf_getbuf_i(
  */
 extern int cf_getbuf(
 	cf_port_addressable_t *port,
-	size_t offset,
+	unsigned int offset,
 	void *buf,
-	size_t len);
+	unsigned int len);
 
 
 /*
@@ -570,9 +610,9 @@ extern int cf_getbuf(
  */
 extern int cf_setbuf_i(
 	cf_port_addressable_t *port,
-	size_t offset,
+	unsigned int offset,
 	void *buf,
-	size_t len,
+	unsigned int len,
 	cf_request_handle_t *request);
 
 
@@ -584,9 +624,9 @@ extern int cf_setbuf_i(
  */
 extern int cf_setbuf(
 	cf_port_addressable_t *port,
-	size_t offset,
+	unsigned int offset,
 	void *buf,
-	size_t len);
+	unsigned int len);
 
 /*
  * Synchronous map memory from addressable port into local address space.
@@ -601,8 +641,8 @@ extern int cf_setbuf(
  */
 extern void *cf_addressable_map(
 	cf_port_addressable_t *port,
-	size_t offset,
-	size_t size,
+	unsigned int offset,
+	unsigned int size,
 	int flags);
 
 
@@ -611,7 +651,7 @@ extern void *cf_addressable_map(
  */
 int cf_addressable_unmap(
 	void *ptr,
-	size_t size);
+	unsigned int size);
 
 
 /*
@@ -624,49 +664,52 @@ extern void cf_release_ref(
 	cf_request_handle_t *request);
 
 /*
- * Test if request has completed
+ * Tests whether or not a wait is read.
  *
- * Returns true if request completed, otherwise returns false.
- *
- * Same semantic as cf_wait() expect that it does not block.
+ * Returns 1 if the wait would return immediately, or 0 if wait would stall.
  */
-extern int cf_test(
-	cf_request_handle_t *request);
+extern int cf_try_wait(
+	cf_request_handle_t request);
+
+/*
+ * Sets a tag used for tracing waits
+ *
+ * Returns nothing
+ */
+
+extern void cf_set_trace_wait_tag(
+	cf_request_handle_t request, int tag);
 
 /*
  * Wait for request to complete
  */
-extern int cf_wait(
+extern void cf_wait(
 	cf_request_handle_t request);
-
-/*
- * Wait for any request in list to complete
- *
- * Returns the index in list for the request that completed.
- */
-extern unsigned int cf_wait_any(
-	cf_request_handle_t *request_list,
-	unsigned int request_count);
 
 /*
  * Wait for all requests in list to complete
  *
  * Returns the number of requests that completed without error.
  */
-extern unsigned int cf_wait_all(
+extern void cf_wait_all(
 	cf_request_handle_t *request_list,
 	unsigned int request_count);
 
 /* trace function */
 extern void sds_trace(unsigned ID, unsigned type);
 
+
 /* additional definitions from sds_lib.h */
 extern unsigned long long sds_clock_counter(void);
+extern unsigned long long sds_clock_frequency(void);
+
 extern void sds_insert_req( unsigned int id, void *req, int num);
 #ifdef __cplusplus
 }
 #endif
-  
+
 #endif /* D_apf_incl */
 
 
+
+// 67d7842dbbe25473c3c32b93c0da8047785f30d78e8a024de1b57352245f9689
